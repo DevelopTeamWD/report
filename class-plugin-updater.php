@@ -5,8 +5,6 @@ if (!defined('ABSPATH')) exit;
 class Lp_Report_Updater
 {
 
-
-
     public $plugin_file;
     public $plugin_basename;
     public $update_url;
@@ -22,7 +20,7 @@ class Lp_Report_Updater
 
         $this->plugin_file     = $plugin_file;
         $this->plugin_basename = plugin_basename($this->plugin_file);
-        $this->update_url      = 'https://raw.githubusercontent.com/huynhlongdev/est-security/refs/heads/main/update-info.json';
+        $this->update_url      = 'https://raw.githubusercontent.com/DevelopTeamWD/report/refs/heads/main/update-info.json';
 
         $plugin_data = get_plugin_data($plugin_file);
         $this->current_version = $plugin_data['Version'];
@@ -33,10 +31,6 @@ class Lp_Report_Updater
 
         // Popup info
         add_filter('plugins_api', [$this, 'plugin_info'], 10, 3);
-
-        echo '<pre>';
-        var_dump($this->plugin_file, $plugin_data);
-        echo '</pre>';
     }
 
     /** CHECK UPDATE */
@@ -46,8 +40,6 @@ class Lp_Report_Updater
         if (empty($transient->checked)) {
             return $transient;
         }
-
-        // error_log('>>>Transient before:' . print_r($transient, true));
 
         $response = wp_remote_get($this->update_url, [
             'timeout' => 15,
@@ -64,7 +56,6 @@ class Lp_Report_Updater
             return $transient;
         }
 
-        // So sánh version
         if (version_compare($this->current_version, $json->version, '<')) {
             $transient->response[$this->plugin_basename] = (object) [
                 'slug'        => $this->slug,
@@ -76,8 +67,6 @@ class Lp_Report_Updater
                 'requires'    => '5.0'
             ];
         }
-
-        // error_log('>>>Transient after:' . print_r($transient, true));
 
         return $transient;
     }
@@ -93,6 +82,7 @@ class Lp_Report_Updater
         if (is_wp_error($response) || wp_remote_retrieve_response_code($response) !== 200) return $res;
 
         $json = json_decode(wp_remote_retrieve_body($response));
+
         if (!$json || empty($json->name) || empty($json->version)) return $res;
 
         return (object)[
