@@ -5,6 +5,8 @@ if (!defined('ABSPATH')) exit;
 class Lp_Report_Updater
 {
 
+
+
     public $plugin_file;
     public $plugin_basename;
     public $update_url;
